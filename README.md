@@ -131,22 +131,10 @@ http://localhost:3000
 - Enhanced security features
 - Performance optimization
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 👥 By
 
 - Devaesh AI-DS (1st year)
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors
-- Special thanks to the Coding Club community
 
 ---
 
