@@ -139,17 +139,15 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👥 Team
+## 👥 By
 
-- [Your Name] - Project Lead
-- [Team Members] - Contributors
+- Devaesh AI-DS (1st year)
 
 ## 🙏 Acknowledgments
 
 - Thanks to all contributors
 - Special thanks to the Coding Club community
-- Inspired by modern event management needs
 
 ---
 
-For more information, please contact [Your Contact Information] 
+For more information, please contact devaeshd19@gmail.com 
