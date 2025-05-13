@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer Dashboard - Coding Club's Rajinikanth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle progress bars
+            document.querySelectorAll('[data-progress]').forEach(el => {
+                const value = el.dataset.progress;
+                el.style.width = value + '%';
+            });
+        });
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold">Coding Club's Rajinikanth</h1>
+            <nav class="hidden md:flex space-x-4">
+                <a href="/organizer/dashboard" class="hover:text-gray-200 transition">Dashboard</a>
+                <a href="/organizer/add_attendee" class="hover:text-gray-200 transition">Add Attendee</a>
+                <a href="/organizer/upload_csv" class="hover:text-gray-200 transition">Upload CSV</a>
+                <a href="/organizer/checkin" class="hover:text-gray-200 transition">Check-In</a>
+                <a href="/organizer/lunch" class="hover:text-gray-200 transition">Lunch</a>
+                <a href="/organizer/swags" class="hover:text-gray-200 transition">Swags</a>
+                <a href="/logout" class="text-red-300 hover:text-red-200 transition">Logout</a>
+            </nav>
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-blue-500 text-white">
+            <a href="/organizer/dashboard" class="block px-4 py-2 hover:bg-blue-600">Dashboard</a>
+            <a href="/organizer/add_attendee" class="block px-4 py-2 hover:bg-blue-600">Add Attendee</a>
+            <a href="/organizer/upload_csv" class="block px-4 py-2 hover:bg-blue-600">Upload CSV</a>
+            <a href="/organizer/checkin" class="block px-4 py-2 hover:bg-blue-600">Check-In</a>
+            <a href="/organizer/lunch" class="block px-4 py-2 hover:bg-blue-600">Lunch</a>
+            <a href="/organizer/swags" class="block px-4 py-2 hover:bg-blue-600">Swags</a>
+            <a href="/logout" class="block px-4 py-2 text-red-300 hover:bg-blue-600">Logout</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 container mx-auto px-4 py-8">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Organizer Dashboard</h1>
+        <% if (messages && messages.length) { %>
+            <% messages.forEach(message => { %>
+                <p class="text-sm mb-4 <%= message.type === 'error' ? 'text-red-500' : 'text-green-500' %>">
+                    <%= message.message %>
+                </p>
+            <% }); %>
+        <% } %>
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Dashboard Stats</h2>
+            <div id="dashboard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <p class="text-gray-600">Total Attendees: <%= total_attendees %></p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <p class="text-gray-600">Registered: <%= total_registered %></p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <p class="text-gray-600">Lunches Served: <%= total_lunches %></p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <p class="text-gray-600">Swags Distributed: <%= total_swags %></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Statistics -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Attendance Statistics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Check-in Rate</h3>
+                    <div class="relative pt-1">
+                        <div class="flex mb-2 items-center justify-between">
+                            <div>
+                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                                    Check-in Progress
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-semibold inline-block text-blue-600">
+                                    <%= Math.round((total_registered / total_attendees) * 100) %>%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                            <div data-progress="<%= Math.round((total_registered / total_attendees) * 100) %>" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Resource Distribution</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">Lunch Distribution</span>
+                                <span class="text-sm font-medium text-gray-700"><%= Math.round((total_lunches / total_attendees) * 100) %>%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div data-progress="<%= Math.round((total_lunches / total_attendees) * 100) %>" class="bg-green-600 h-2.5 rounded-full"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">Swag Distribution</span>
+                                <span class="text-sm font-medium text-gray-700"><%= Math.round((total_swags / total_attendees) * 100) %>%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div data-progress="<%= Math.round((total_swags / total_attendees) * 100) %>" class="bg-purple-600 h-2.5 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Statistics -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Feedback Analysis</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Rating Distribution</h3>
+                    <div class="space-y-2">
+                        <% for (let i = 5; i >= 1; i--) { %>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="text-yellow-400">⭐</span>
+                                    <span class="ml-2"><%= i %></span>
+                                </div>
+                                <div class="flex-1 ml-4">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div data-progress="<%= (rating_distribution[i] || 0) %>" class="bg-blue-600 h-2.5 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <span class="ml-4"><%= rating_distribution[i] || 0 %>%</span>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Recent Feedback</h3>
+                    <div class="space-y-4">
+                        <% feedbacks.slice(0, 5).forEach(feedback => { %>
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600"><%= feedback.timestamp %></span>
+                                    <span class="text-yellow-400">
+                                        <% for (let i = 0; i < feedback.rating; i++) { %>
+                                            ⭐
+                                        <% } %>
+                                    </span>
+                                </div>
+                                <p class="text-gray-700"><%= feedback.comments %></p>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h2 class="text-xl font-semibold mb-4">Registered Attendees</h2>
+            <% if (attendees && attendees.length > 0) { %>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border rounded-lg shadow-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-700">
+                                <th class="border px-4 py-2 text-left">Attendee ID</th>
+                                <th class="border px-4 py-2 text-left">User ID</th>
+                                <th class="border px-4 py-2 text-left">Name</th>
+                                <th class="border px-4 py-2 text-left">Email</th>
+                                <th class="border px-4 py-2 text-left">Phone</th>
+                                <th class="border px-4 py-2 text-left">Role</th>
+                                <th class="border px-4 py-2 text-left">QR Code Path</th>
+                                <th class="border px-4 py-2 text-left">NFT Token ID</th>
+                                <th class="border px-4 py-2 text-left">Checked In</th>
+                                <th class="border px-4 py-2 text-left">Lunch Received</th>
+                                <th class="border px-4 py-2 text-left">Swags Received</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% attendees.forEach(attendee => { %>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2"><%= attendee.id %></td>
+                                    <td class="border px-4 py-2"><%= attendee.user_id %></td>
+                                    <td class="border px-4 py-2"><%= attendee.name %></td>
+                                    <td class="border px-4 py-2"><%= attendee.email %></td>
+                                    <td class="border px-4 py-2"><%= attendee.phone %></td>
+                                    <td class="border px-4 py-2"><%= attendee.role %></td>
+                                    <td class="border px-4 py-2"><%= attendee.qr_code %></td>
+                                    <td class="border px-4 py-2"><%= attendee.nft_token_id %></td>
+                                    <td class="border px-4 py-2"><%= attendee.registered ? 'Yes' : 'No' %></td>
+                                    <td class="border px-4 py-2"><%= attendee.lunch_received ? 'Yes' : 'No' %></td>
+                                    <td class="border px-4 py-2"><%= attendee.swags_received ? 'Yes' : 'No' %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <p class="text-gray-500">No attendees registered yet.</p>
+            <% } %>
+        </div>
+    </main>
+</body>
+</html>

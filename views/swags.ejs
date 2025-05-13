@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swags Registration - Coding Club's Rajinikanth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold">Coding Club's Rajinikanth</h1>
+            <nav class="hidden md:flex space-x-4">
+                <a href="/organizer/dashboard" class="hover:text-gray-200 transition">Dashboard</a>
+                <a href="/organizer/add_attendee" class="hover:text-gray-200 transition">Add Attendee</a>
+                <a href="/organizer/upload_csv" class="hover:text-gray-200 transition">Upload CSV</a>
+                <a href="/organizer/checkin" class="hover:text-gray-200 transition">Check-In</a>
+                <a href="/organizer/lunch" class="hover:text-gray-200 transition">Lunch</a>
+                <a href="/organizer/swags" class="hover:text-gray-200 transition">Swags</a>
+                <a href="/logout" class="text-red-300 hover:text-red-200 transition">Logout</a>
+            </nav>
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-blue-500 text-white">
+            <a href="/organizer/dashboard" class="block px-4 py-2 hover:bg-blue-600">Dashboard</a>
+            <a href="/organizer/add_attendee" class="block px-4 py-2 hover:bg-blue-600">Add Attendee</a>
+            <a href="/organizer/upload_csv" class="block px-4 py-2 hover:bg-blue-600">Upload CSV</a>
+            <a href="/organizer/checkin" class="block px-4 py-2 hover:bg-blue-600">Check-In</a>
+            <a href="/organizer/lunch" class="block px-4 py-2 hover:bg-blue-600">Lunch</a>
+            <a href="/organizer/swags" class="block px-4 py-2 hover:bg-blue-600">Swags</a>
+            <a href="/logout" class="block px-4 py-2 text-red-300 hover:bg-blue-600">Logout</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 container mx-auto px-4 py-8">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Swags Registration (NFC/QR)</h1>
+        <form method="POST" action="/organizer/toggle_nfc" class="mb-6">
+            <button type="submit" class="bg-<%= nfcEnabled ? 'red' : 'green' %>-500 text-white px-4 py-2 rounded-md hover:bg-<%= nfcEnabled ? 'red' : 'green' %>-600 transition">
+                <%= nfcEnabled ? 'Disable NFC' : 'Enable NFC' %>
+            </button>
+        </form>
+        <% if (messages && messages.length) { %>
+            <% messages.forEach(message => { %>
+                <p class="text-sm mb-4 <%= message.type === 'error' ? 'text-red-500' : 'text-green-500' %>">
+                    <%= message.message %>
+                </p>
+            <% }); %>
+        <% } %>
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">NFC Tap or QR Scan</h2>
+            <p class="text-gray-600 mb-4">Use NFC tap to register swags for attendees. If NFC fails, use the QR Scanner to scan their QR code.</p>
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-4">
+                <h3 class="text-lg font-medium mb-4">Option 1: NFC Tap (Manual Entry for Demo)</h3>
+                <form method="POST" action="/organizer/swags" class="space-y-4">
+                    <div>
+                        <label for="attendee_id" class="block text-sm font-medium text-gray-700">Attendee ID (Simulate NFC Tap)</label>
+                        <input type="text" name="attendee_id" id="attendee_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Register Swags (NFC)</button>
+                </form>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-medium mb-4">Option 2: QR Scanner (Camera)</h3>
+                <button id="start-qr-scan" class="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition mb-4">QR Scanner</button>
+                <div id="qr-reader" class="hidden w-full"></div>
+                <!-- Hidden form to submit scanned QR code data -->
+                <form id="qr-form" method="POST" action="/organizer/swags" class="hidden">
+                    <input type="hidden" name="attendee_id" id="qr-attendee-id">
+                </form>
+            </div>
+        </div>
+        <% if (attendee) { %>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">Attendee Details</h2>
+                <p class="text-gray-600">Name: <%= attendee.name %></p>
+                <p class="text-gray-600">Email: <%= attendee.email %></p>
+                <p class="text-gray-600">Phone: <%= attendee.phone %></p>
+                <p class="text-gray-600">Role: <%= attendee.role %></p>
+                <p class="text-gray-600">Swags Received: <%= attendee.swags_received ? 'Yes' : 'No' %></p>
+            </div>
+        <% } %>
+    </main>
+
+    <script>
+        const startQrScanButton = document.getElementById('start-qr-scan');
+        const qrReader = document.getElementById('qr-reader');
+        const qrForm = document.getElementById('qr-form');
+        const qrAttendeeIdInput = document.getElementById('qr-attendee-id');
+        let html5QrCode;
+
+        startQrScanButton.addEventListener('click', () => {
+            qrReader.classList.remove('hidden');
+            startQrScanButton.classList.add('hidden');
+
+            html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start(
+                { facingMode: "environment" }, // Use rear camera if available
+                { fps: 10, qrbox: { width: 250, height: 250 } }, // QR scan settings
+                (decodedText, decodedResult) => {
+                    // Successfully scanned QR code
+                    qrAttendeeIdInput.value = decodedText; // Set the scanned attendee ID
+                    html5QrCode.stop().then(() => {
+                        qrReader.classList.add('hidden');
+                        startQrScanButton.classList.remove('hidden');
+                        qrForm.submit(); // Submit the form with the scanned ID
+                    });
+                },
+                (errorMessage) => {
+                    // Handle scan errors (optional)
+                    console.log(`QR scan error: ${errorMessage}`);
+                }
+            ).catch((err) => {
+                console.error(`Failed to start QR scanner: ${err}`);
+                qrReader.classList.add('hidden');
+                startQrScanButton.classList.remove('hidden');
+                alert('Failed to access camera. Please ensure camera permissions are granted.');
+            });
+        });
+    </script>
+</body>
+</html>

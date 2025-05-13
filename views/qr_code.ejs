@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your QR Code - EventHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold">EventHub</h1>
+            <nav class="hidden md:flex space-x-4">
+                <a href="/attendee/events" class="hover:text-gray-200 transition">Events</a>
+                <a href="/attendee/qr_code" class="hover:text-gray-200 transition">QR Code</a>
+                <a href="/logout" class="text-red-300 hover:text-red-200 transition">Logout</a>
+            </nav>
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-blue-500 text-white">
+            <a href="/attendee/events" class="block px-4 py-2 hover:bg-blue-600">Events</a>
+            <a href="/attendee/qr_code" class="block px-4 py-2 hover:bg-blue-600">QR Code</a>
+            <a href="/logout" class="block px-4 py-2 text-red-300 hover:bg-blue-600">Logout</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 container mx-auto px-4 py-8">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Your QR Code</h1>
+        <% if (messages && messages.length) { %>
+            <% messages.forEach(message => { %>
+                <p class="text-sm mb-4 <%= message.type === 'error' ? 'text-red-500' : 'text-green-500' %>">
+                    <%= message.message %>
+                </p>
+            <% }); %>
+        <% } %>
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
+            <h2 class="text-xl font-semibold mb-4 text-center">Scan to Register</h2>
+            <img src="/<%= qr_code_path %>" alt="QR Code" class="w-48 h-48 mx-auto mb-4">
+            <p class="text-center text-gray-600">Attendee ID: <%= attendee_id %></p>
+            <p class="text-center text-gray-600">NFT Token ID: <%= nft_token_id %></p>
+        </div>
+    </main>
+</body>
+</html>

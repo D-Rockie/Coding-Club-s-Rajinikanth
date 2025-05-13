@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendee Events - Coding Club's Rajinikanth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold">Coding Club's Rajinikanth</h1>
+            <nav class="hidden md:flex space-x-4">
+                <a href="/attendee/events" class="hover:text-gray-200 transition">Events</a>
+                <a href="/attendee/qr_code" class="hover:text-gray-200 transition">QR Code</a>
+                <a href="/logout" class="text-red-300 hover:text-red-200 transition">Logout</a>
+            </nav>
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-blue-500 text-white">
+            <a href="/attendee/events" class="block px-4 py-2 hover:bg-blue-600">Events</a>
+            <a href="/attendee/qr_code" class="block px-4 py-2 hover:bg-blue-600">QR Code</a>
+            <a href="/logout" class="block px-4 py-2 text-red-300 hover:bg-blue-600">Logout</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 container mx-auto px-4 py-8">
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Attendee Events</h1>
+        <% if (messages && messages.length) { %>
+            <% messages.forEach(message => { %>
+                <p class="text-sm mb-4 <%= message.type === 'error' ? 'text-red-500' : 'text-green-500' %>">
+                    <%= message.message %>
+                </p>
+            <% }); %>
+        <% } %>
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Event Details</h2>
+            <% if (event) { %>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-800"><%= event.name %></h3>
+                    <p class="text-gray-600">Date: <%= event.date %></p>
+                    <p class="text-gray-600">Time: <%= event.time %></p>
+                    <p class="text-gray-600">Location: <%= event.location %></p>
+                    <p class="mt-2 text-gray-700"><%= event.description %></p>
+                </div>
+            <% } else { %>
+                <p class="text-gray-500">No event details available.</p>
+            <% } %>
+        </div>
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Event Schedule</h2>
+            <% if (sessions && sessions.length > 0) { %>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <ul class="space-y-4">
+                        <% sessions.forEach(session => { %>
+                            <li class="border-b pb-4 last:border-b-0">
+                                <h3 class="text-lg font-semibold text-gray-800"><%= session.title %></h3>
+                                <p class="text-gray-600">Time: <%= session.time %></p>
+                                <p class="text-gray-600">Location: <%= session.location %></p>
+                                <p class="text-gray-700"><%= session.description %></p>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </div>
+            <% } else { %>
+                <p class="text-gray-500">No sessions scheduled.</p>
+            <% } %>
+        </div>
+        <div>
+            <h2 class="text-xl font-semibold mb-4">Your Event Status</h2>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <p class="mb-2 text-gray-600">
+                    <span class="font-semibold">Checked In:</span>
+                    <%= checkedIn ? '✔️' : '❌' %>
+                </p>
+                <p class="mb-2 text-gray-600">
+                    <span class="font-semibold">Lunch Received:</span>
+                    <%= lunchReceived ? '✔️' : '❌' %>
+                </p>
+                <p class="mb-2 text-gray-600">
+                    <span class="font-semibold">Swags Received:</span>
+                    <%= swagsReceived ? '✔️' : '❌' %>
+                </p>
+            </div>
+        </div>
+        <div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Event Feedback</h2>
+            <form action="/attendee/submit_feedback" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                    <div class="flex space-x-2">
+                        <% for(let i = 1; i <= 5; i++) { %>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="rating" value="<%= i %>" class="hidden peer" required>
+                                <span class="text-2xl peer-checked:text-yellow-400 text-gray-300 hover:text-yellow-400">⭐</span>
+                            </label>
+                        <% } %>
+                    </div>
+                </div>
+                <div>
+                    <label for="comments" class="block text-sm font-medium text-gray-700 mb-2">Comments</label>
+                    <textarea id="comments" name="comments" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Submit Feedback</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+    function toggleEditForm() {
+        const viewMode = document.getElementById('viewMode');
+        const editMode = document.getElementById('editMode');
+        viewMode.classList.toggle('hidden');
+        editMode.classList.toggle('hidden');
+    }
+    </script>
+</body>
+</html>
